@@ -1,0 +1,54 @@
+from kivy.app import App
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+
+class TicTacToeApp(App):
+    def build(self):
+        self.title = 'Tic Tac Toe'
+        self.current_player = 'X'
+        self.board = [' ' for _ in range(9)]
+        
+        layout = GridLayout(cols=3)
+        
+        self.buttons = []
+        for i in range(9):
+            button = Button(text=' ', font_size=40)
+            button.bind(on_press=self.make_move)
+            layout.add_widget(button)
+            self.buttons.append(button)
+
+        return layout
+
+    def make_move(self, button):
+        index = self.buttons.index(button)
+        
+        if self.board[index] == ' ':
+            self.board[index] = self.current_player
+            button.text = self.current_player
+            
+            if self.check_winner():
+                print(f'Player {self.current_player} wins!')
+                for btn in self.buttons:
+                    btn.disabled = True
+            elif ' ' not in self.board:
+                print('It\'s a tie!')
+            else:
+                self.current_player = 'O' if self.current_player == 'X' else 'X'
+
+    def check_winner(self):
+        winning_combinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], # rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], # columns
+            [0, 4, 8], [2, 4, 6]             # diagonals
+        ]
+        
+        for combo in winning_combinations:
+            if (self.board[combo[0]] == self.board[combo[1]] == 
+                self.board[combo[2]] != ' '):
+                return True
+        
+        return False
+
+if __name__ == '__main__':
+    TicTacToeApp().run()
